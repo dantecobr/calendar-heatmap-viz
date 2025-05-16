@@ -1,17 +1,16 @@
-// Importa dados do Looker Studio via dscc
 dscc.subscribeToData(function (dataResponse) {
   const rows = dataResponse.tables.DEFAULT;
   if (!rows || rows.length === 0) return;
 
-  const dateDimensionId = Object.keys(rows[0]).find(key => rows[0][key].hasOwnProperty("formatted"));
-  const metricId = Object.keys(rows[0]).find(key => rows[0][key].hasOwnProperty("value"));
+  const dateKey = Object.keys(rows[0]).find(k => rows[0][k].formatted);
+  const metricKey = Object.keys(rows[0]).find(k => rows[0][k].value !== undefined);
 
-  const rawData = rows.map(row => [
-    row[dateDimensionId].formatted,
-    row[metricId].value
+  const data = rows.map(row => [
+    row[dateKey].formatted,
+    row[metricKey].value
   ]);
 
-  drawCalendar(rawData);
+  drawCalendar(data);
 }, { transform: dscc.tableTransform });
 
 function drawCalendar(data) {
@@ -26,18 +25,17 @@ function drawCalendar(data) {
   const formatDate = d3.timeFormat("%Y-%m-%d");
 
   const parsedData = {};
-  data.forEach(row => {
-    const date = parseDate(row[0]);
-    const value = +row[1];
-    if (date) parsedData[formatDate(date)] = value;
+  data.forEach(([dateStr, value]) => {
+    const date = parseDate(dateStr);
+    if (date) parsedData[formatDate(date)] = +value;
   });
 
   const dates = Object.keys(parsedData).map(d => new Date(d));
-  const startDate = d3.min(dates);
-  const endDate = d3.max(dates);
-  const years = d3.timeYear.range(d3.timeYear.floor(startDate), d3.timeYear.offset(endDate, 1));
+  const start = d3.min(dates);
+  const end = d3.max(dates);
+  const years = d3.timeYear.range(d3.timeYear.floor(start), d3.timeYear.offset(end, 1));
 
-  const colorScale = d3.scaleThreshold()
+  const color = d3.scaleThreshold()
     .domain([1, 10, 25, 50, 100])
     .range(["#161917", "#70160e", "#9e0004", "#b9030f", "#e1e3db"]);
 
@@ -64,11 +62,4 @@ function drawCalendar(data) {
       .attr("class", "day")
       .attr("width", cellSize)
       .attr("height", cellSize)
-      .attr("x", d => d3.timeWeek.count(d3.timeYear(d), d) * cellSize)
-      .attr("y", d => d.getDay() * cellSize)
-      .datum(d => formatDate(d))
-      .style("fill", d => parsedData[d] ? colorScale(parsedData[d]) : "#161917")
-      .append("title")
-      .text(d => `${d}: ${parsedData[d] || 0}`);
-  });
-}
+      .attr("x", d => d3.timeWeek.count(d3.timeYear(d
