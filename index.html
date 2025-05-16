@@ -1,36 +1,20 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <style>
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      background-color: #161917;
-      color: #e1e3db;
-    }
-    .day {
-      stroke: #161917;
-    }
-    .month {
-      fill: none;
-      stroke: #e1e3db;
-      stroke-width: 2px;
-    }
-    .tooltip {
-      position: absolute;
-      background-color: #e1e3db;
-      color: #161917;
-      border: 1px solid #70160e;
-      padding: 5px;
-      font-size: 12px;
-      pointer-events: none;
-    }
-  </style>
-</head>
-<body>
-  <div id="calendar"></div>
-  <script src="script.js"></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/@google/dscc@1.1.1"></script>
+    <style>
+      body {
+        background-color: #161917;
+        color: #e1e3db;
+        font-family: sans-serif;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="calendar"></div>
+    <script src="script.js"></script>
+  </body>
 </html>

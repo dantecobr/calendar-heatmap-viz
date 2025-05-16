@@ -1,24 +1,22 @@
-function drawCalendar(data) {
+function drawCalendar(dataRows) {
   const container = document.getElementById("calendar");
   container.innerHTML = "";
 
   const width = 1000;
   const height = 150;
   const cellSize = 17;
-
   const parseDate = d3.timeParse("%Y-%m-%d");
-  const parsedData = {};
 
-  data.forEach(row => {
+  const parsedData = {};
+  dataRows.forEach(row => {
     const date = parseDate(row[0]);
     const value = +row[1];
-    parsedData[d3.timeFormat("%Y-%m-%d")(date)] = value;
+    if (date) parsedData[d3.timeFormat("%Y-%m-%d")(date)] = value;
   });
 
   const dates = Object.keys(parsedData).map(d => new Date(d));
   const startDate = d3.min(dates);
   const endDate = d3.max(dates);
-
   const years = d3.timeYear.range(d3.timeYear.floor(startDate), d3.timeYear.offset(endDate, 1));
 
   const colorScale = d3.scaleThreshold()
@@ -57,14 +55,11 @@ function drawCalendar(data) {
   });
 }
 
-function drawViz(data, config) {
-  const rows = data.tables.DEFAULT.map(row => row.map(cell => cell.v));
-  drawCalendar(rows);
-}
-
-// Integração com Looker Studio
-google.visualization.data = {
-  onDataChanged: function(dataResponse) {
-    drawViz(dataResponse, {});
-  }
-};
+// Inscrição para receber os dados do Looker Studio
+dscc.subscribeToData((data) => {
+  const dataRows = data.tables.DEFAULT.map(row => [
+    row["dateDimensionId"].formatted,
+    row["metricId"].value
+  ]);
+  drawCalendar(dataRows);
+}, {transform: dscc.tableTransform});
