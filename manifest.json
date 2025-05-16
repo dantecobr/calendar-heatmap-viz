@@ -1,10 +1,10 @@
 {
   "dataStudio": {
     "name": "Visualização em Calendário",
-    "logoUrl": "https://example.com/logo.png",
+    "logoUrl": "https://dantecobr.github.io/calendar-heatmap-viz/logo.png",
     "company": "Dante Marques",
     "description": "Visualização de calendário para Looker Studio.",
-    "supportUrl": "https://example.com/support"
+    "supportUrl": "https://dantecobr.github.io/calendar-heatmap-viz/"
   },
   "components": {
     "visualization": "index.html"
