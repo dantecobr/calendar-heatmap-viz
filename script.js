@@ -1,17 +1,35 @@
-function drawCalendar(dataRows) {
+// Importa dados do Looker Studio via dscc
+dscc.subscribeToData(function (dataResponse) {
+  const rows = dataResponse.tables.DEFAULT;
+  if (!rows || rows.length === 0) return;
+
+  const dateDimensionId = Object.keys(rows[0]).find(key => rows[0][key].hasOwnProperty("formatted"));
+  const metricId = Object.keys(rows[0]).find(key => rows[0][key].hasOwnProperty("value"));
+
+  const rawData = rows.map(row => [
+    row[dateDimensionId].formatted,
+    row[metricId].value
+  ]);
+
+  drawCalendar(rawData);
+}, { transform: dscc.tableTransform });
+
+function drawCalendar(data) {
   const container = document.getElementById("calendar");
   container.innerHTML = "";
 
   const width = 1000;
   const height = 150;
   const cellSize = 17;
+
   const parseDate = d3.timeParse("%Y-%m-%d");
+  const formatDate = d3.timeFormat("%Y-%m-%d");
 
   const parsedData = {};
-  dataRows.forEach(row => {
+  data.forEach(row => {
     const date = parseDate(row[0]);
     const value = +row[1];
-    if (date) parsedData[d3.timeFormat("%Y-%m-%d")(date)] = value;
+    if (date) parsedData[formatDate(date)] = value;
   });
 
   const dates = Object.keys(parsedData).map(d => new Date(d));
@@ -48,18 +66,9 @@ function drawCalendar(dataRows) {
       .attr("height", cellSize)
       .attr("x", d => d3.timeWeek.count(d3.timeYear(d), d) * cellSize)
       .attr("y", d => d.getDay() * cellSize)
-      .datum(d3.timeFormat("%Y-%m-%d"))
+      .datum(d => formatDate(d))
       .style("fill", d => parsedData[d] ? colorScale(parsedData[d]) : "#161917")
       .append("title")
       .text(d => `${d}: ${parsedData[d] || 0}`);
   });
 }
-
-// Inscrição para receber os dados do Looker Studio
-dscc.subscribeToData((data) => {
-  const dataRows = data.tables.DEFAULT.map(row => [
-    row["dateDimensionId"].formatted,
-    row["metricId"].value
-  ]);
-  drawCalendar(dataRows);
-}, {transform: dscc.tableTransform});
