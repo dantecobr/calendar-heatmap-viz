@@ -1,9 +1,9 @@
 {
   "dataStudio": {
-    "name": "Calendário Heatmap",
+    "name": "Visualização em Calendário",
     "logoUrl": "https://example.com/logo.png",
-    "company": "Seu Nome ou Empresa",
-    "description": "Visualização de calendário estilo MAQ/Power BI para Looker Studio.",
+    "company": "Dante Marques",
+    "description": "Visualização de calendário para Looker Studio.",
     "supportUrl": "https://example.com/support"
   },
   "components": {
